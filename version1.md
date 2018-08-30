@@ -1,6 +1,6 @@
-# Version 1
+# Version 1 - the Minimal Viable Alpha
 
-V1 represents a simple system of GC types that is module-internal (types are entirely private) but whose object instances can be passed between wasm modules and wasm and JS.  It aims to be the minimal system that can do something useful but compromises on expressibility in several ways and on downcast performance.
+V1 represents a simple system of GC types that is module-internal (types are entirely private) but whose object instances can be passed between wasm modules and wasm and JS.  It aims to be a "minimal viable alpha" (MVA): the minimal system that can do something useful but compromises on expressibility in several ways and on downcast performance.
 
 Vesion 1 is not yet in any Firefox build; follow [bug 1444925](https://bugzilla.mozilla.org/show_bug.cgi?id=1444925) and its blockers.
 
