@@ -1,5 +1,25 @@
 # Version 1
 
+V1 represents a simple system of GC types that is module-internal (types are entirely private) but whose object instances can be passed between wasm modules and wasm and JS.  It aims to be the minimal system that can do something useful but compromises on expressibility in several ways and on downcast performance.
+
+## Scope
+
+There are only structure types, no array types yet.
+
+The structure types are "plain" (no notion of methods or vtables) and there is no explicit inheritance among types.
+
+Wasm structure types are instantiated as JS TypedObject instances.
+
+Wasm struct instances can be passed between Wasm and JS as function arguments, function return values, and in global variables.
+
+Struct types / ref types (other than anyref) are entirely private to a module and are not exposed in any way via function arguments, function returns, or globals, not even via functions in tables; nor are the constructors for the JS TypedObjects that represent the wasm objects available to JS.  Furthermore, JS can read object fields that have ref types (other than anyref) but cannot write them; JS sees them as if they were marked immutable.
+
+Note: Code that needs to communicate with JS must accept anyref as parameters and return anyref as values, or use anyref globals, or anyref object fields, and must use struct.narrow to check type compatibility as appropriate.
+
+We use name equivalence for our intra-module types: (ref T) = (ref U) iff T and U are the same type index
+
+There is implicit inheritance among structures: if a structure B is a prefix of a structure D (ie D has at least as many fields as B and the corresponding types of the fields of B and D have types that are equal) then D is a subtype of B.  The instruction struct.narrow can be used to test whether something that is known to be a B is in fact a D.
+
 ## Struct and Ref Types
 
 Source syntax:
@@ -51,7 +71,7 @@ The only valid flag in a field_type is 0x01, which indicates a mutable field.
 
 For ref_type, the parameter must name a struct type.
 
-## Type semantics / compatibility [also evolving]:
+## Type semantics / compatibility:
 
 Equality is nominal:
 
@@ -78,7 +98,7 @@ T <: U if T and U are struct types, T has at least as many fields as U,
           and the types of the corresponding fields of U and T are the same (as determined by =)
 ```
 
-Nominal subtyping rule for structures [not yet meaningful because no extends clause]:
+Nominal subtyping rule for structures (not yet meaningful because no *extends* clause):
 
 ```
 T <: U if T and U are struct types and T extends U or T extends W where W <: U by the nominal subtyping rule
