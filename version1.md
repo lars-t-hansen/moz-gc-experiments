@@ -22,6 +22,14 @@ We use name equivalence for our intra-module types: (ref T) = (ref U) iff T and 
 
 There is implicit inheritance among structures: if a structure B is a prefix of a structure D (ie D has at least as many fields as B and the corresponding types of the fields of B and D have types that are equal) then D is a subtype of B.  The instruction struct.narrow can be used to test whether something that is known to be a B is in fact a D.
 
+## Feature control
+
+The experimental GC feature is only available if a special section is present in each module.  Without this section, validation will fail.
+
+The section has ID = 42 (GcFeatureOptIn), byte length 1, and the single byte in the section is the version number, which must be 1.  As we move to later versions, older content may or may not remain compatible with newer engines; newer engines that cannot process older content will reject the content in validation.
+
+The new section must be the first non-custom section in the module.
+
 ## Struct and Ref Types
 
 Source syntax:
@@ -41,7 +49,7 @@ Struct names represent type table indices.
 Field names represent integer field indices.  Field names can be reused but must always represent the same (index, type) pair.
 The change to ValueType to incorporate (ref T) extends to all other uses of ValueType: Globals / Global imports, Parameters, Returns, Locals, Block/Loop/If, the Null operator
 
-## Encoding draft
+### Encoding draft
 
 In the Types section, struct and function types can be interleaved, and the "form" field of each entry in the section determines what we look at.
 
@@ -67,13 +75,13 @@ and the encoding of a ref_type is straightforward:
 ref_type     0x6E varuint32    the parameter is a reference into the type section
 ```
 
-## Validation
+### Validation
 
 The only valid flag in a field_type is 0x01, which indicates a mutable field.
 
 For ref_type, the parameter must name a struct type.
 
-## Type semantics / compatibility:
+### Type semantics / compatibility:
 
 Equality is nominal:
 
