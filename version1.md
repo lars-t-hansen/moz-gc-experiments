@@ -2,9 +2,23 @@
 
 V1 represents a simple system of GC types that is module-internal (types are entirely private) but whose object instances can be passed between wasm modules and wasm and JS.  It aims to be a "minimal viable alpha" (MVA): the minimal system that can do something useful but compromises on expressibility in several ways and on downcast performance.
 
+## Brief summary
+
+* new section to opt-in to this experimental system
+* new --wasm-gc / javascript.options.wasm_gc switches to enable in the engine (*will go away before MVA is done*)
+* `anyref` type
+* structure type definitions w/o explicit inheritance; implicit inheritance through quasi-structural downcast
+* nominal type equality
+* simple prefix typing based on type equality for implict upcast
+* `(ref T)` type where T is a structure type
+* locals, parameters, globals, and return values of `anyref` and `ref` type
+* `ref` types cannot be used on APIs that are visible outside the module (ie on globals or parameters and returns of exported functions or private functions in exported tables)
+* instructions `ref.null`, `ref.is_null`, `ref.eq`, `struct.new`, `struct.get`, `struct.set`, `struct.narrow`
+* instances of structs are visible to JS as TypedObject instances
+
 Vesion 1 is not yet in any Firefox build; follow [bug 1444925](https://bugzilla.mozilla.org/show_bug.cgi?id=1444925) and its blockers.
 
-## Scope
+## Detailed scope for v1
 
 There are only structure types, no array types yet.
 
@@ -26,9 +40,11 @@ There is implicit inheritance among structures: if a structure B is a prefix of 
 
 The experimental GC feature is only available if a special section is present in each module.  Without this section, validation will fail.
 
-The section has ID = 42 (GcFeatureOptIn), byte length 1, and the single byte in the section is the version number, which must be 1.  As we move to later versions, older content may or may not remain compatible with newer engines; newer engines that cannot process older content will reject the content in validation.
+The section has ID = 42 (GcFeatureOptIn), byte length 1, and the single byte in the section is the version number, which must be `1` at the moment.  As we move to later versions, older content may or may not remain compatible with newer engines; newer engines that cannot process older content will reject the content in validation.
 
 The new section must be the first non-custom section in the module.
+
+In the textual format accepted by SpiderMonkey's wasmTextToBinary(), write `(gc_feature_opt_in 1)` to create this section.
 
 ## Struct and Ref Types
 
