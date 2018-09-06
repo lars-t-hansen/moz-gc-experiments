@@ -104,8 +104,10 @@ Equality is nominal:
 ```
 T = U if T and U are the same primitive type (i32, i64, f32, f64)
 anyref = anyref
-(ref T) = (ref U) if T = U, where T and U are indices into the type space
+(ref T) = (ref U) if T = U, where T and U are indices into the same type space
 ```
+
+Type spaces are per-instance.  Thus, the phrase "the same type space" above entails that ref types from two different instances never are equal.  In particular, if a module is instantiated twice and a reference to a struct object created in one instance is passed to the other instance, the latter will not recognize the object reference as an instance of any of its types.
 
 Common subtyping rules:
 
