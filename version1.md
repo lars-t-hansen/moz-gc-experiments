@@ -259,6 +259,8 @@ _Execution:_
 
 ## JS interface
 
+### Objects
+
 Wasm struct type instances can escape to JS via anyref parameters/returns/globals and are seen as opaque TypedObjects by JS code.  The fields of these instances are named `_0`, `_1`, and so on; the naming is stopgap, and the naming system will change eventually.
 
 A struct type defined in Wasm is not directly exportable from Wasm and is available to JS only through reflection.  In particular, since each struct instance has a `constructor` property, JS can normally construct new instances by means of `new (obj.constructor)(...)`.
@@ -270,3 +272,7 @@ As JS does not yet have an int64 or BigInt type, Wasm `i64` fields are reflected
 Fields of type `anyref` can be written from JS if they are mutable; fields of type `(ref T)` are however always immutable to JS, and a struct with `(ref T)` fields cannot be constructed from JS -- the constructor is accessible but will throw.
 
 (The "TypedObjects" are not a standard thing, but a Firefox rendition of an evolution of what was once the proposal for TypedObjects in JS.  The best available resource is [here](https://github.com/tschneidereit/typed-objects-explainer), but it too is probably not accurate or complete.  For our purposes, TypedObjects are sealed objects with type-constrained properties and private storage.)
+
+### Globals
+
+Globals of type `(ref T)` are always reflected as immutable to JS, since we do not yet have a notion of what it means for the type `T` to be exposed outside the module.
