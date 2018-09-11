@@ -50,3 +50,5 @@ Structs with array fields will flow out of wasm to js through anyref interfaces,
  
 Cursorily it looks like TypedObject distinguishes arrays of different lengths as being of different types;
 this is a poor fit for the above but probably not terrible.  Worse for JS than for wasm, for sure.
+
+Currently it looks like TypedObject does not support arrays of primitive type at all; though we can probably emulate it as arrays of one-element structures with no storage overhead.  It's just weird.
