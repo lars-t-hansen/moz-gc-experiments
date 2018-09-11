@@ -1,20 +1,20 @@
 # Version 1 - the Minimal Viable Alpha
 
-V1 represents a simple system of GC types that is module-internal (types are entirely private to a module) but whose object instances can be passed between wasm modules and wasm and JS.  It aims to be a "minimal viable alpha" (MVA): the minimal system that can do something useful but compromises on expressibility in several ways and on downcast performance.
+Version 1 represents a simple system of GC types that is module-internal (types are entirely private to a module) but whose object instances can be passed between wasm modules and between wasm and JS.  It aims to be a "minimal viable alpha" (MVA): the minimal system that can do something useful and allow for experimentation, but which compromises on expressibility and performance in several ways.
 
 ## Brief summary
 
-* new section to opt-in to this experimental system
-* new --wasm-gc / javascript.options.wasm_gc switches to enable in the engine (*will go away before MVA is done*)
-* `anyref` type
-* structure type definitions w/o explicit inheritance; implicit inheritance through quasi-structural downcast
-* nominal type equality
+* new module section to opt-in to this experimental system
+* new --wasm-gc / javascript.options.wasm_gc switches to enable in the engine (*will go away before MVA is complete*)
+* structure type definitions `(struct (field T) ...)` w/o explicit inheritance
+* reference types: `anyref` and `(ref T)` where T names a structure type
+* nominal type equality for primitive and reference types
 * simple prefix typing based on type equality for implict upcast
-* `(ref T)` type where T is a structure type
-* locals, parameters, globals, and return values of `anyref` and `ref` type
-* `ref` types cannot be used on APIs that are visible outside the module (ie on globals or parameters and returns of exported functions or private functions in exported tables)
-* instructions `ref.null`, `ref.is_null`, `ref.eq`, `struct.new`, `struct.get`, `struct.set`, `struct.narrow`
-* instances of structs are visible to JS as TypedObject instances
+* shallow structural downcast from a type A to a type B where A is a prefix of B
+* locals, parameters, globals, and return values of reference types
+* restrictions on `(ref T)` types to avoid exposing types outside the module
+* new instructions `ref.null`, `ref.is_null`, `ref.eq`, `struct.new`, `struct.get`, `struct.set`, `struct.narrow`
+* instances of structure types are visible to JS as TypedObject instances
 
 Vesion 1 is not yet in any Firefox build; follow [bug 1444925](https://bugzilla.mozilla.org/show_bug.cgi?id=1444925) and its blockers.
 
@@ -273,6 +273,13 @@ Fields of type `anyref` can be written from JS if they are mutable; fields of ty
 
 (The "TypedObjects" are not a standard thing, but a Firefox rendition of an evolution of what was once the proposal for TypedObjects in JS.  The best available resource is [here](https://github.com/tschneidereit/typed-objects-explainer), but it too is probably not accurate or complete.  For our purposes, TypedObjects are sealed objects with type-constrained properties and private storage.)
 
-### Globals
+### Export/import restrictions
 
-Globals of type `(ref T)` are always reflected as immutable to JS, since we do not yet have a notion of what it means for the type `T` to be exposed outside the module.
+As types are module-internal for the time being, entities that would reveal types or would require types to be revealed cannot be imported or exported.  Types are revealed by `(ref T)` types, so these entities cannot be exported or imported directly:
+
+* functions whose parameters or result are `(ref T)` types
+* globals that hold a `(ref T)` type
+
+In addition, if a table is imported or exported, a function whose parameters or result are `(ref T)` types cannot be stored in the table by means of an initializing element segment.
+
+Finally, we can think of a struct instance escaping to JS as exporting it, and a struct instance flowing into a wasm module as importing it.  As described in the previous section, there are run-time restrictions on JS storing values into `(ref T)` typed  fields of "exported" objects by assignment or construction.  Furthermore, a module that "imports" an object that was constructed from a type defined in another module (or for that matter in JS) can only downcast the object to one of its own types if it does not have a `(ref T)` field, a consequence of our current nominal type equivalence.
