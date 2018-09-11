@@ -52,3 +52,5 @@ Cursorily it looks like TypedObject distinguishes arrays of different lengths as
 this is a poor fit for the above but probably not terrible.  Worse for JS than for wasm, for sure.
 
 The current syntax to create a constructor for an array of a given base type and length is `new TypedObject.ArrayType(basetype, length)`, which is not what the explainer has, but it works in FF64 for primitive array types too.  For ref types we'd want to use TypedObject.Object as the base type.
+
+Given that the TO arrays will probably remain roughly what they are (ie one type per length) we'll need to manage storage for the types carefully so that type objects can be garbage collected when they no longer have instances and aren't referenced; a weak table of some kind seems likely, mapping (base type x length) -> weakly held and lazily created constructor.  Unless we bypass that machinery somehow of course, but that may create trouble for JS.
