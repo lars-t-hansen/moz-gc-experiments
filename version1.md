@@ -128,7 +128,42 @@ There are automatic upcasts to supertypes.  Currently these upcasts always use t
 
 Instruction encodings are temporary.  0xFC is the "misc" prefix, previously "numeric".
 
-`Instruction ::= Ref.Eq | Struct.New | Struct.Get | Struct.Set | Struct.Narrow`
+`Instruction ::= Ref.Null | Ref.IsNull | Ref.Eq | Struct.New | Struct.Get | Struct.Set | Struct.Narrow`
+
+### ref.null
+
+Create a typed null reference.
+
+_Synopsis:_ `Ref.Null ::= ... <ref.null Type>`
+
+_Syntax:_ Type is a ValType, indicating the target type
+
+_Encoding:_ 0xD0 Type:ValType
+
+_Validation:_
+* Type must be anyref or (ref T) where T is a structure
+
+_Result type_: Type
+
+_Execution_:
+* Push a null reference
+
+### ref.is_null
+
+Compare a reference to null.
+
+_Synopsis:_ `Ref.IsNull ::= ... Expr <ref.is_null>`
+
+_Encoding:_ 0xD1
+
+_Validation:_
+* The type of Expr must be anyref or (ref T) where T is a struct type
+
+_Result type:_ i32
+
+_Execution:_
+* pop Expr
+* if Expr is a null reference, push 1, otherwise push 0
 
 ### ref.eq
 
@@ -136,7 +171,7 @@ Compare two references for pointer equality.
 
 _Synopsis:_ `Ref.Eq ::= ... Expr_0 Expr_1 <ref.eq>`
 
-_Encoding:_ 0xD1
+_Encoding:_ 0xD2
 
 _Validation:_
 * The types of Expr_0 and Expr_1 must unify in the normal way and must be subtypes of anyref
@@ -145,7 +180,7 @@ _Result type:_ i32
 
 _Execution:_
 * pop Expr_0 and Expr_1
-* if Expr_0 and Expr_1 are the same pointer value return 1, otherwise return 0
+* if Expr_0 and Expr_1 are the same pointer value push 1, otherwise push 0
 
 ### struct.new
 
@@ -155,7 +190,7 @@ Construct a new object of a given type, providing initial values for all fields.
 
 _Syntax:_ StructName is a type table index embedded in the instruction
 
-_Encoding:_ 0xFC 0x50 StructName:varuint32; StructName references the TYPE section of the module
+_Encoding:_ 0xFC 0x50 StructName:varuint32
 
 _Validation:_
 * StructName must name a struct type T with K fields
@@ -168,7 +203,7 @@ _Execution:_
 * Create V, a new instance of T.
 * If the allocation fails then trap.
 * Pop K values off the stack and store them into the corresponding fields of V: the value of Expr_0 to field 0, Expr_1 to field 1, and so on.
-* Return &V
+* Push &V
 
 ### struct.get
 
@@ -190,7 +225,7 @@ _Result type:_ The type of field FieldName in T
 _Execution:_
 * Let Ptr be the value of Expr
 * If Ptr is NULL then trap
-* Return the value of field FieldName of *Ptr.
+* Push the value of field FieldName of *Ptr.
 
 ### struct.set
 
@@ -240,12 +275,12 @@ _Result type:_ ToType
 _Execution:_
 * Let Ptr be the value of Expr
 * If FromType is anyref and ToType is anyref then return Ptr
-* If Ptr is NULL then return NULL
+* If Ptr is NULL then push NULL and exit
 * If FromType is anyref then we must first unbox:
-  * if the referent of Ptr is not a structure type instance then return NULL
+  * if the referent of Ptr is not a structure type instance then push NULL and exit
 * Let S be the concrete structure type of the referent of Ptr
-* If S <: ToType then return Ptr
-* Return NULL
+* If S <: ToType then push Ptr and exit
+* Push NULL
 
 ## JS interface
 
