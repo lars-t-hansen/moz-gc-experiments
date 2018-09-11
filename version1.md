@@ -1,6 +1,6 @@
 # Version 1 - the Minimal Viable Alpha
 
-V1 represents a simple system of GC types that is module-internal (types are entirely private) but whose object instances can be passed between wasm modules and wasm and JS.  It aims to be a "minimal viable alpha" (MVA): the minimal system that can do something useful but compromises on expressibility in several ways and on downcast performance.
+V1 represents a simple system of GC types that is module-internal (types are entirely private to a module) but whose object instances can be passed between wasm modules and wasm and JS.  It aims to be a "minimal viable alpha" (MVA): the minimal system that can do something useful but compromises on expressibility in several ways and on downcast performance.
 
 ## Brief summary
 
@@ -256,3 +256,17 @@ _Execution:_
 * Let S be the concrete structure type of the referent of Ptr
 * If S <: ToType then return Ptr
 * Return NULL
+
+## JS interface
+
+Wasm struct type instances can escape to JS via anyref parameters/returns/globals and are seen as opaque TypedObjects by JS code.  The fields of these instances are named `_0`, `_1`, and so on; the naming is stopgap, and the naming system will change eventually.
+
+A struct type defined in Wasm is not directly exportable from Wasm and is available to JS only through reflection.  In particular, since each struct instance has a `constructor` property, JS can normally construct new instances by means of `new (obj.constructor)(...)`.
+
+Fields that are immutable in the wasm struct definition are not writable from JS; an attempt to write such a field will cause an exception to be thrown.
+
+As JS does not yet have an int64 or BigInt type, Wasm `i64` fields are reflected in the object instance as two `i32` fields.  If the `i64` field would normally have been named `_n`, the two fields are named `_n_low` and `_n_high`.  These fields are always immutable to JS, and a struct with `i64` fields cannot be constructed from JS -- the constructor is accessible but will throw.
+
+Fields of type `anyref` can be written from JS if they are mutable; fields of type `(ref T)` are however always immutable to JS, and a struct with `(ref T)` fields cannot be constructed from JS -- the constructor is accessible but will throw.
+
+(The "TypedObjects" are not a standard thing, but a Firefox rendition of an evolution of what was once the proposal for TypedObjects in JS.  The best available resource is [here](https://github.com/tschneidereit/typed-objects-explainer), but it too is probably not accurate or complete.  For our purposes, TypedObjects are sealed objects with type-constrained properties and private storage.)
