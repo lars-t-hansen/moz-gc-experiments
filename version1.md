@@ -2,7 +2,7 @@
 
 Version 1 represents a simple system of GC types that is module-internal (types are entirely private to a module) but whose object instances can be passed between wasm modules and between wasm and JS.  It aims to be a "minimal viable alpha" (MVA): the minimal system that can do something useful and allow for experimentation, but which compromises on expressibility and performance in several ways.
 
-## Table of contents
+**Table of contents:**
 
 [Brief summary](#brief-summary)  
 [Feature control](#feature-control)  
