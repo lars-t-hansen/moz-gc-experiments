@@ -2,6 +2,14 @@
 
 Version 1 represents a simple system of GC types that is module-internal (types are entirely private to a module) but whose object instances can be passed between wasm modules and between wasm and JS.  It aims to be a "minimal viable alpha" (MVA): the minimal system that can do something useful and allow for experimentation, but which compromises on expressibility and performance in several ways.
 
+## Table of contents
+
+[Brief summary](#brief-summary)  
+[Feature control](#feature-control)  
+[Struct and Ref Types](#struct-and-ref-types)  
+[Instructions](#instructions)  
+[JS Interface](#js-interface)
+
 ## Brief summary
 
 * new module section to opt-in to this experimental system
@@ -17,24 +25,6 @@ Version 1 represents a simple system of GC types that is module-internal (types 
 * instances of structure types are visible to JS as TypedObject instances
 
 Vesion 1 is not yet in any Firefox build; follow [bug 1444925](https://bugzilla.mozilla.org/show_bug.cgi?id=1444925) and its blockers.
-
-## Detailed scope for v1
-
-There are only structure types, no array types yet.
-
-The structure types are "plain" (no notion of methods or vtables) and there is no explicit inheritance among types.
-
-Wasm structure types are instantiated as JS TypedObject instances.
-
-Wasm struct instances can be passed between Wasm and JS as function arguments, function return values, and in global variables.
-
-Struct types / ref types (other than anyref) are entirely private to a module and are not exposed in any way via function arguments, function returns, or globals, not even via functions in tables; nor are the constructors for the JS TypedObjects that represent the wasm objects available to JS.  Furthermore, JS can read object fields that have ref types (other than anyref) but cannot write them; JS sees them as if they were marked immutable.
-
-Note: Code that needs to communicate with JS must accept anyref as parameters and return anyref as values, or use anyref globals, or anyref object fields, and must use struct.narrow to check type compatibility as appropriate.
-
-We use name equivalence for our intra-module types: (ref T) = (ref U) iff T and U are the same type index
-
-There is implicit inheritance among structures: if a structure B is a prefix of a structure D (ie D has at least as many fields as B and the corresponding types of the fields of B and D have types that are equal) then D is a subtype of B.  The instruction struct.narrow can be used to test whether something that is known to be a B is in fact a D.
 
 ## Feature control
 
