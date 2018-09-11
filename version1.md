@@ -4,13 +4,13 @@ Version 1 represents a simple system of GC types that is module-internal (types 
 
 **Table of contents:**
 
-[Brief summary](#brief-summary)  
+[Overview](#overview)  
 [Feature control](#feature-control)  
 [Struct and Ref Types](#struct-and-ref-types)  
 [Instructions](#instructions)  
 [JS Interface](#js-interface)
 
-## Brief summary
+## Overview
 
 * new module section to opt-in to this experimental system
 * new --wasm-gc / javascript.options.wasm_gc switches to enable in the engine (*will go away before MVA is complete*)
@@ -24,7 +24,7 @@ Version 1 represents a simple system of GC types that is module-internal (types 
 * new instructions `ref.null`, `ref.is_null`, `ref.eq`, `struct.new`, `struct.get`, `struct.set`, `struct.narrow`
 * instances of structure types are visible to JS as TypedObject instances
 
-Vesion 1 is not yet in any Firefox build; follow [bug 1444925](https://bugzilla.mozilla.org/show_bug.cgi?id=1444925) and its blockers.
+Version 1 is not yet in any Firefox build; follow [bug 1444925](https://bugzilla.mozilla.org/show_bug.cgi?id=1444925) and its blockers.
 
 ## Feature control
 
