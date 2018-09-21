@@ -24,7 +24,7 @@ Version 1 represents a simple system of GC types that is module-internal (types 
 * new instructions `ref.null`, `ref.is_null`, `ref.eq`, `struct.new`, `struct.get`, `struct.set`, `struct.narrow`
 * instances of structure types are visible to JS as TypedObject instances
 
-Version 1 is not yet in any Firefox build; follow [bug 1444925](https://bugzilla.mozilla.org/show_bug.cgi?id=1444925) and its blockers.
+As of September 21, this has all landed in Firefox.  What we want for Version 1 to be complete is to remove the command line switches and some hacks that are turned on by them.  Follow [bug 1444925](https://bugzilla.mozilla.org/show_bug.cgi?id=1444925) and its blockers.
 
 ## Feature control
 
