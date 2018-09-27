@@ -54,7 +54,7 @@ Struct names represent type table indices.
 
 The extension of ValueType to incorporate (ref T) extends to all other uses of ValueType: Globals / Global imports, Parameters, Returns, Locals, Block/Loop/If, the Null operator
 
-Field names represent integer field indices.  Field names must be unique in the module; a useful trick to make this restriction bearable is to prepend the structure name to every field name along with a legal separator such as `_` or `.`, eg, `$mystruct.x` inside a structure called `$mystruct`.
+Field names represent integer field indices.  Field names must be unique in the module; a useful trick to make this restriction bearable is to prepend the structure name to every field name along with a legal separator such as `_` or `.`, eg, `$mystruct.x` for a field logically called `x` inside a structure called `$mystruct`.
 
 ### Encoding draft
 
