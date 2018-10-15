@@ -17,7 +17,7 @@ Setting elements in a table-of-anyref from JS will store JS objects.
 
 Can table.copy only between tables of the same type.
 
-Can table.fill only tables of type anyfunc since the source in this case is an elem segment which can only reference function values.
+Can table.init only tables of type anyfunc since the source in this case is an elem segment which can only reference function values.
 
 TODO: What if the value being set is not an object?  Run ToObject on it?
 
