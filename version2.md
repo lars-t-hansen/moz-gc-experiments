@@ -11,13 +11,14 @@ Table can now be "anyref" in addition to "anyfunc".  The code for "anyref" is 0x
 
 "anyref" can be used as the type passed to the JS WebAssembly.Table constructor.
 
-TODO: What about `call_indirect`?
+Initially, at least, `call_indirect` cannot call via a table-of-anyref.
 
-TODO: Setting values in an anyref table from JS, semantics?  Conversions?
+Setting elements in a table-of-anyref from JS will store JS objects.
+
+TODO: What if the value being set is not an object?  Run ToObject on it?
 
 (Eventually)  Tables that are "anyref" can be targeted by element segments holding function values, 
 and the values stored in such tables are the function values that would be obtained from the host side
 if the host side reached into a corresponding anyfunc table and extracted functions.
 
 Element segments are *not* further extended, they can reference only function values.
-
