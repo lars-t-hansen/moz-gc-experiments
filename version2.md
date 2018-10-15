@@ -5,9 +5,17 @@ Version 2 will extend Version 1, most likely in a compatible fashion.  Here's wh
 
 ### Tables-of-anyref
 
-Table can now be "anyref" in addition to "anyfunc".
+Table can now be "anyref" in addition to "anyfunc".  The code for "anyref" is 0x6F, its standard type code.
 
-Tables that are "anyref" can be targeted by element segments holding function values, 
+"anyref" can be used in the text format.
+
+"anyref" can be used as the type passed to the JS WebAssembly.Table constructor.
+
+TODO: What about `call_indirect`?
+
+TODO: Setting values in an anyref table from JS, semantics?  Conversions?
+
+(Eventually)  Tables that are "anyref" can be targeted by element segments holding function values, 
 and the values stored in such tables are the function values that would be obtained from the host side
 if the host side reached into a corresponding anyfunc table and extracted functions.
 
