@@ -101,3 +101,10 @@ Change the current `(ref.null T)` construction into `ref.null` and introduce the
 ### Tentative cleanup, other
 
 Rename or create alias for `ref.is_null` as `ref.isnull` (as spec requires).  Superficial text format change.
+
+## Currently out of scope for Version 2
+
+### table-of-ref
+
+Along with anyfunc and table-of-anyref we can extend this to table-of-ref in general, with fairly obvious semantics.  This is slightly tricky though because this entails either (a) those tables are not exported or (b) we need to talk about imported / exported types.  We can do (a) for V2 easily, however.
+
