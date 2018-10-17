@@ -74,6 +74,8 @@ call_indirect type-index table-index
 
 We introduce a new value type `anyfunc`, where `anyfunc` <: `anyref`.
 
+In every text context, `funcref` has the same meaning as `anyfunc`, and probably `funcref` should be the canonical name by and by.
+
 We can `table.copy` from table T1 to table T2 if the element type of T1 is a subtype of the element type of T2.  Specifically, we can `table.copy` from `T(anyfunc)` to `T(anyref)`.  TODO: under what conditions?  Exported functions?
 
 We can `table.init` a `T(anyref)` since anyfunc <: anyref.  TODO: under what conditions?  Exported functions?
