@@ -1,28 +1,37 @@
-
 Work in progress.
 
-Version 2 will extend Version 1, most likely in a compatible fashion.  Here's what's going on.
+Version 2 will extend Version 1, ideally in a compatible fashion.  Here's what's going on.
 
 ### Tables-of-anyref
 
 Table can now be "anyref" in addition to "anyfunc".  The code for "anyref" is 0x6F, its standard type code.
 
-"anyref" can be used in the text format.
+"anyref" can be used in the text format for the type of the table.
 
 "anyref" can be used as the type passed to the JS WebAssembly.Table constructor.
 
-Initially, at least, `call_indirect` cannot call via a table-of-anyref.
+Setting elements in a table-of-anyref from JS will store JS objects.  TODO: What if the value being set is not an object?  Run ToObject on it a la what the stub does on the call boundary?
 
-Setting elements in a table-of-anyref from JS will store JS objects.
+Element segments are *not* further extended, they can reference only function values.
 
-Can table.copy only between tables of the same type.
+We can table.copy only between tables of the same type (TODO: this is too strict probably since anyfunc <: anyref).
 
-Can table.init only tables of type anyfunc since the source in this case is an elem segment which can only reference function values.
-
-TODO: What if the value being set is not an object?  Run ToObject on it?
+Can table.init only tables of type anyfunc since the source in this case is an elem segment which can only reference function values. (TODO: this is too strict probabkly since anyfunc <: anyref)
 
 (Eventually)  Tables that are "anyref" can be targeted by element segments holding function values, 
 and the values stored in such tables are the function values that would be obtained from the host side
 if the host side reached into a corresponding anyfunc table and extracted functions.
 
-Element segments are *not* further extended, they can reference only function values.
+`call_indirect` requires table-of-anyfunc; table-of-anyref is not allowed.
+
+table.get: on table-of-anyref this is obvious; on table-of-anyfunc what do we return?  probably a function object.  But under what restrictions?  Exported function?
+
+table.set: on table-of-anyref this is fairly obvious; value must be anyref.  on table-of-anyfunc the static type must be anyfunc.
+
+TODO: no downcast function at this point.
+
+### Tentative cleanup
+
+Change the current `(ref.null T)` construction into `ref.null` and introduce the nullref type.  For backward compatibility, continue to accept the old encoding?  Tricky, because then we'll need a new opcode.
+
+Rename or create alias for `ref.is_null` as `ref.isnull` (as spec requires).  Superficial text format change.
