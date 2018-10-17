@@ -34,11 +34,11 @@ There can be several tables, with indices starting at zero.  As usual(?), import
 
 In the text format, tables can be named, `(table $t length type)`.
 
-An active element segment still can only target one specific table, since the table index is baked into the element.
+An active element segment still can only target one specific table, since the table index is baked into the element.  But it can target any of the tables in the module.  Presumably there is opcode space for that at the moment.
 
-The table index is always baked into the instruction.  In the text format, the table index is optional for backwards compatibility reasons; this is not a problem (yet).
+The table index is always baked into the instruction.  In the text format, the table index is optional for backwards compatibility reasons; this is not a problem (yet), provided the table index follows existing constant indices.
 
-Fully parenthesized syntax, here "type" and "table" can be literal indices or names:
+Fully parenthesized syntax, here "type" and "table" can be literal indices or names in the appropriate namespaces:
 
 ```
 (call_indirect type table argument-expr ...)
@@ -58,8 +58,15 @@ way we now handle blahblah, eg,
 ```
 element-index-expr
 table.get table-index
+
+argument-expr
+...
+call_indirect type-index table-index
 ```
-(TODO: it's possible we need to parenthesize the last line here).
+
+(TODO: it's possible we need to parenthesize the multi-word operators, investigate.)
+
+(TODO: it's possible we want to support disambiguating syntax, (type T) and (table T) to be used in these instructions, optionally.)
 
 ### anyfunc as value type, and fallout from that
 
@@ -79,9 +86,10 @@ this is fairly obvious; value must be anyref.  on `T(anyfunc)` the static type m
 
 TODO: no downcast function at this point, so if we have an `anyref` we can't cast it dynamically to `anyfunc` or test whether we could do that safely.  
 
+### nullref
 
-### Tentative cleanup
+Change the current `(ref.null T)` construction into `ref.null` and introduce the `nullref` type.  For backward compatibility, continue to accept the old encoding?  Tricky, because then we'll need a new opcode.
 
-Change the current `(ref.null T)` construction into `ref.null` and introduce the nullref type.  For backward compatibility, continue to accept the old encoding?  Tricky, because then we'll need a new opcode.
+### Tentative cleanup, other
 
 Rename or create alias for `ref.is_null` as `ref.isnull` (as spec requires).  Superficial text format change.
