@@ -24,9 +24,42 @@ We can `table.copy` only between tables of the same type.
 
 `call_indirect` requires `T(anyfunc)`.
 
-`table.get` can target only `T(anyref)`, the result is `anyref`.
+`(table.get index)` can target only `T(anyref)`, the result is `anyref`.
 
-`table.set` can target only `T(anyref)` and the static type of the value must be some `ref` type.
+`(table.set index value)` can target only `T(anyref)` and the static type of the value must be some `ref` type.
+
+### Multiple tables
+
+There can be several tables, with indices starting at zero.  As usual(?), imports are numbered before local tables.
+
+In the text format, tables can be named, `(table $t length type)`.
+
+An active element segment still can only target one specific table, since the table index is baked into the element.
+
+The table index is always baked into the instruction.  In the text format, the table index is optional for backwards compatibility reasons; this is not a problem (yet).
+
+Fully parenthesized syntax, here "type" and "table" can be literal indices or names:
+
+```
+(call_indirect type table argument-expr ...)
+(call_indirect type argument-expr ...)
+(table.get element-index-expr)
+(table.get table-index element-index-expr)
+(table.set element-index-expr value-expr)
+(table.set table-index element-index-expr value-expr)
+// todo: table.init
+// todo: table.copy
+// todo: table.fill
+```
+
+In the RPN text format, if the instructions carry table indices then they follow the opcodes in the same
+way we now handle blahblah, eg,
+
+```
+element-index-expr
+table.get table-index
+```
+(TODO: it's possible we need to parenthesize the last line here).
 
 ### anyfunc as value type, and fallout from that
 
