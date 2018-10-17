@@ -2,9 +2,11 @@ Work in progress.
 
 Version 2 will extend Version 1, ideally in a compatible fashion.  Here's what's going on.
 
-### Tables-of-anyref
+## Generalized tables
 
-(Note, this is just a first step; it is further generalized in the next section when `anyfunc` becomes a value type.)
+We'll do this in increments, as follows.
+
+### Tables-of-anyref
 
 A table can now be `anyref` in addition to `anyfunc`.  The code for `anyref` is 0x6F, its standard type code.
 
