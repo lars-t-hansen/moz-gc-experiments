@@ -49,9 +49,8 @@ Fully parenthesized syntax, here "type" and "table" can be literal indices or na
 (table.get table-index element-index-expr)
 (table.set element-index-expr value-expr)
 (table.set table-index element-index-expr value-expr)
-// todo: table.init
-// todo: table.copy
-// todo: table.fill
+(table.init dest-table-index src-segment-index dest-index-expr src-index-expr len-expr)
+(table.copy dest-table-index src-table-index dest-index-expr src-index-expr len-expr)
 ```
 
 In the RPN text format, if the instructions carry table indices then they follow the opcodes in the same
@@ -64,11 +63,16 @@ table.get table-index
 argument-expr
 ...
 call_indirect type-index table-index
+
+dest-index-expr
+src-index-expr
+len-expr
+table.copy dest-table-index src-table-index
 ```
 
 (TODO: it's possible we need to parenthesize the multi-word operators, investigate.)
 
-(TODO: it's possible we want to support disambiguating syntax, (type T) and (table T) to be used in these instructions, optionally.)
+(TODO: it's possible we want to support disambiguating syntax, (type T) and (table T), or type=T and table=T / src=T, dest=T to be used in these instructions, optionally.)
 
 ### anyfunc as value type, and fallout from that
 
