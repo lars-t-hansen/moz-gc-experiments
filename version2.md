@@ -4,31 +4,33 @@ Version 2 will extend Version 1, ideally in a compatible fashion.  Here's what's
 
 ### Tables-of-anyref
 
-Table can now be "anyref" in addition to "anyfunc".  The code for "anyref" is 0x6F, its standard type code.
+Type calculus is extended with `anyfunc` <: `anyref`.
 
-"anyref" can be used in the text format for the type of the table.
+Table can now be `anyref` in addition to `anyfunc`.  The code for `anyref` is 0x6F, its standard type code.
 
-"anyref" can be used as the type passed to the JS WebAssembly.Table constructor.
+Below, denote table-of-anyref as `T(anyref)` and table-of-anyfunc as `T(anyfunc)`.
 
-Setting elements in a table-of-anyref from JS will store JS objects.  TODO: What if the value being set is not an object?  Run ToObject on it a la what the stub does on the call boundary?
+`anyref` can be used in the wasm text format for the type of the table.
+
+`anyref` can be used as the type name passed to the JS WebAssembly.Table constructor.
+
+Setting elements in a `T(anyref)` from JS will store JS objects.  TODO: What if the value being set is not an object?  Run ToObject on it a la what the stub does on the call boundary?
 
 Element segments are *not* further extended, they can reference only function values.
 
-We can table.copy only between tables of the same type (TODO: this is too strict probably since anyfunc <: anyref).
+We can `table.copy` only between tables of the same type (TODO: this is too strict since anyfunc <: anyref).
 
-Can table.init only tables of type anyfunc since the source in this case is an elem segment which can only reference function values. (TODO: this is too strict probabkly since anyfunc <: anyref)
+`table.init` can only init `T(anyfunc)` since the source in this case is an elem segment which can only reference function values. (TODO: this is too strict since anyfunc <: anyref)
 
-(Eventually)  Tables that are "anyref" can be targeted by element segments holding function values, 
-and the values stored in such tables are the function values that would be obtained from the host side
-if the host side reached into a corresponding anyfunc table and extracted functions.
+(Eventually)  `T(anyref)` can be targeted by element segments holding function values,  and the values stored in such tables are the function values that would be obtained from the host side if the host side reached into a corresponding anyfunc table and extracted functions.
 
-`call_indirect` requires table-of-anyfunc; table-of-anyref is not allowed.
+`call_indirect` requires `T(anyfunc)`; `T(anyref)` is not allowed.
 
-table.get: on table-of-anyref this is obvious; on table-of-anyfunc what do we return?  probably a function object.  But under what restrictions?  Exported function?
+table.get: on `T(anyref)` this is obvious; on `T(anyfunc)` what do we return?  probably a function object.  But under what restrictions?  Exported function?
 
-table.set: on table-of-anyref this is fairly obvious; value must be anyref.  on table-of-anyfunc the static type must be anyfunc.
+table.set: on `T(anyref)` this is fairly obvious; value must be anyref.  on `T(anyfunc)` the static type must be anyfunc.
 
-TODO: no downcast function at this point.
+TODO: no downcast function at this point, so if we have an `anyref` we can't cast it dynamically to `anyfunc` or test whether we could do that safely.  
 
 ### Tentative cleanup
 
