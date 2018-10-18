@@ -51,6 +51,8 @@ Fully parenthesized syntax, here "type" and "table" can be literal indices or na
 (table.set table-index element-index-expr value-expr)
 (table.init dest-table-index src-segment-index dest-index-expr src-index-expr len-expr)
 (table.copy dest-table-index src-table-index dest-index-expr src-index-expr len-expr)
+(table.grow delta)
+(table.grow table-index delta)
 ```
 
 In the RPN text format, if the instructions carry table indices then they follow the opcodes in the same
