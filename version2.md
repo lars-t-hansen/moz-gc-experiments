@@ -6,7 +6,7 @@ Version 2 will extend Version 1, ideally in a compatible fashion.  Here's what's
 
 We'll do this in increments, as follows.
 
-### Tables-of-anyref
+### Tables-of-anyref + instructions to manipulate tables
 
 A table can now be `anyref` in addition to `anyfunc`.  The code for `anyref` is 0x6F, its standard type code.
 
@@ -27,6 +27,8 @@ Element segments are *not* further extended, they can reference only function va
 `(table.get index)` can target only `T(anyref)`, the result is `anyref`.
 
 `(table.set index value)` can target only `T(anyref)` and the static type of the value must be some `ref` type.
+
+`(table.grow delta)` exposes the existing JS-level mechanism to wasm and lets even non-exported tables grow. (Memo to self: any implications for bounds checking optimizations?)
 
 ### Multiple tables (WIP)
 
