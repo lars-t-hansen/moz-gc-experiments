@@ -88,6 +88,8 @@ table.copy dest-table-index src-table-index
 
 We can `table.copy` only between tables of the same type.
 
+Possibly, if there are multiple tables in play we should consider disallowing the default table, but it's hard to do this without two passes...  The text format is a boondoggle anyway and used only for small things, so it's probably not a big deal. 
+
 ### anyfunc as value type, and fallout from that
 
 (Work in progress)
