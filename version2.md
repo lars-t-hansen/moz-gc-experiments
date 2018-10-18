@@ -20,8 +20,6 @@ Setting elements in a `T(anyref)` from JS will store JS objects.  If the value b
 
 Element segments are *not* further extended, they can reference only function values.
 
-We can `table.copy` only between tables of the same type.
-
 `table.init` can only init `T(anyfunc)` since the source in this case is an elem segment which can only reference function values.
 
 `call_indirect` requires `T(anyfunc)`.
@@ -30,7 +28,7 @@ We can `table.copy` only between tables of the same type.
 
 `(table.set index value)` can target only `T(anyref)` and the static type of the value must be some `ref` type.
 
-### Multiple tables
+### Multiple tables (WIP)
 
 There can be several tables, with indices starting at zero.  As usual(?), imports are numbered before local tables.
 
@@ -73,6 +71,8 @@ table.copy dest-table-index src-table-index
 (TODO: it's possible we need to parenthesize the multi-word operators, investigate.)
 
 (TODO: it's possible we want to support disambiguating syntax, (type T) and (table T), or type=T and table=T / src=T, dest=T to be used in these instructions, optionally.)
+
+We can `table.copy` only between tables of the same type.
 
 ### anyfunc as value type, and fallout from that
 
