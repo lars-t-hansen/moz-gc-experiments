@@ -36,7 +36,7 @@ Encoding: (0xFC 0x10 0x00) where the last byte is a flags byte that will eventua
 
 Encoding: (0xFC 0x11 0x00) where the last byte is a flags byte that will eventually accomodate a table index
 
-`(table.grow delta)` exposes the existing JS-level mechanism to wasm and lets even non-exported tables grow. (Memo to self: any implications for bounds checking optimizations?)  The result is i32, the old size of the table.
+`(table.grow delta)` exposes the existing JS-level mechanism to wasm and lets even non-exported tables grow. (Memo to self: any implications for bounds checking optimizations?)  The result is i32, the old size of the table; the result will appear negative for memories > 2GB.  It currently traps if the grow fails, but this is probably undesirable.  -1 is available as a return value if we want to signal this in-band.
 
 Encoding: (0xFC 0x0F 0x00) where the last byte is a flags byte that will eventually accomodate a table index
 
