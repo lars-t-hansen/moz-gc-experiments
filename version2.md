@@ -6,6 +6,8 @@ Version 2 will extend Version 1, ideally in a compatible fashion.  Here's what's
 
 We'll do this in increments, as follows.
 
+To opt in to any new instructions, the module must declare `(gc_feature_opt_in 2)`.  At this time, existing version 1 content continues to work and need not opt in specifically to version 2.
+
 ### Tables-of-anyref + instructions to manipulate tables
 
 A table can now be `anyref` in addition to `anyfunc`.  
