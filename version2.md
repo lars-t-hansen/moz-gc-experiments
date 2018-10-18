@@ -8,7 +8,9 @@ We'll do this in increments, as follows.
 
 ### Tables-of-anyref + instructions to manipulate tables
 
-A table can now be `anyref` in addition to `anyfunc`.  The code for `anyref` is 0x6F, its standard type code.
+A table can now be `anyref` in addition to `anyfunc`.  
+
+Encoding: The code for `anyref` is 0x6F, its standard type code.
 
 Denote table-of-anyref as `T(anyref)` and table-of-anyfunc as `T(anyfunc)`.
 
@@ -26,9 +28,15 @@ Element segments are *not* further extended, they can reference only function va
 
 `(table.get index)` can target only `T(anyref)`, the result is `anyref`.
 
+Encoding: (0xFC 0x10 0x00) where the last byte is a flags byte that will eventually accomodate a table index
+
 `(table.set index value)` can target only `T(anyref)` and the static type of the value must be some `ref` type.
 
+Encoding: (0xFC 0x11 0x00) where the last byte is a flags byte that will eventually accomodate a table index
+
 `(table.grow delta)` exposes the existing JS-level mechanism to wasm and lets even non-exported tables grow. (Memo to self: any implications for bounds checking optimizations?)
+
+Encoding: (0xFC 0x0F 0x00) where the last byte is a flags byte that will eventually accomodate a table index
 
 ### Multiple tables (WIP)
 
