@@ -30,13 +30,13 @@ Element segments are *not* further extended, they can reference only function va
 
 `(table.get index)` can target only `T(anyref)`, the result is `anyref`.
 
-Encoding: (0xFC 0x10 0x00) where the last byte is a flags byte that will eventually accomodate a table index.  Traps on OOB.
+Encoding: (0xFC 0x10 0x00) where the last byte is a flags byte that will eventually accomodate a table index.  Traps on OOB with RangeError.
 
-`(table.set index value)` can target only `T(anyref)` and the static type of the value must be some `ref` type; the result is void.  Traps on OOB.
+`(table.set index value)` can target only `T(anyref)` and the static type of the value must be some `ref` type; the result is void.  Traps on OOB with RangeError.
 
 Encoding: (0xFC 0x11 0x00) where the last byte is a flags byte that will eventually accomodate a table index
 
-`(table.grow delta)` exposes the existing JS-level mechanism to wasm and lets even non-exported tables grow. (Memo to self: any implications for bounds checking optimizations?)  The argument is i32.  The result is i32, the old size of the table; the result will appear negative for memories > 2GB.  Traps on negative arguments, so the maximum growth increment is 2GB; not ideal.  It currently traps if the grow fails, but this is probably undesirable.  -1 is available as a return value if we want to signal this in-band.  Or we switch to int64 for the argument and result here.
+`(table.grow delta)` exposes the existing JS-level mechanism to wasm and lets even non-exported tables grow. (Memo to self: any implications for bounds checking optimizations?)  The argument is i32.  The result is i32, the old size of the table; the result will appear negative for memories > 2GB.  Traps on negative arguments with RangeError, so the maximum growth increment is 2GB; not ideal.  It currently traps with RuntimeError if the grow fails, but this is probably undesirable.  -1 is available as a return value if we want to signal this in-band.  Or we switch to int64 for the argument and result here.
 
 Encoding: (0xFC 0x0F 0x00) where the last byte is a flags byte that will eventually accomodate a table index
 
