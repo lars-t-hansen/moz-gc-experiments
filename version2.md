@@ -32,11 +32,11 @@ Element segments are *not* further extended, they can reference only function va
 
 Encoding: (0xFC 0x10 0x00) where the last byte is a flags byte that will eventually accomodate a table index
 
-`(table.set index value)` can target only `T(anyref)` and the static type of the value must be some `ref` type.
+`(table.set index value)` can target only `T(anyref)` and the static type of the value must be some `ref` type; the result is void.
 
 Encoding: (0xFC 0x11 0x00) where the last byte is a flags byte that will eventually accomodate a table index
 
-`(table.grow delta)` exposes the existing JS-level mechanism to wasm and lets even non-exported tables grow. (Memo to self: any implications for bounds checking optimizations?)
+`(table.grow delta)` exposes the existing JS-level mechanism to wasm and lets even non-exported tables grow. (Memo to self: any implications for bounds checking optimizations?)  The result is i32, the old size of the table.
 
 Encoding: (0xFC 0x0F 0x00) where the last byte is a flags byte that will eventually accomodate a table index
 
