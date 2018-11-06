@@ -92,28 +92,24 @@ Fully parenthesized syntax:
 ;; table.fill TBD
 ```
 
-In the RPN text format, if the instructions carry table indices then they follow the opcodes in the same
-way we now handle blahblah, eg,
+In the RPN text format, if the instructions carry table indices then they follow the opcodes, eg, 
 
 ```
 element-index-expr
 table.get table-ref
+```
 
+```
 argument-expr
-...
-call_indirect table-ref
+call_indirect table-ref type-ref
+```
 
+```
 dest-index-expr
 src-index-expr
 len-expr
 table.copy dest-table-ref src-table-ref
 ```
-
-(TODO: doesn't seem highly plausible that the table.copy syntax will work out like this.)
-
-(TODO: it's possible we need to parenthesize the multi-word operators, investigate.)
-
-(TODO: it's possible we want to support disambiguating syntax, (type T) and (table T), or type=T and table=T / src=T, dest=T to be used in these instructions, optionally.)
 
 We can `table.copy` only between tables of the same type.
 
