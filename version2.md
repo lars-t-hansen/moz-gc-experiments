@@ -30,19 +30,19 @@ Encoding of `T(anyref)`:
 
 #### table.get
 
-`(table.get index)` can target only `T(anyref)`, the result is `anyref`.
+`(table.get index-expr)` can target only `T(anyref)`, the result is `anyref`.
 
 Encoding: (0xFC 0x10 0x00) where the last byte is a flags byte that will eventually accomodate a table index.  Traps on OOB with RangeError.
 
 #### table.set
 
-`(table.set index value)` can target only `T(anyref)` and the static type of the value must be some `ref` type; the result is void.  Traps on OOB with RangeError.
+`(table.set index-expr value-expr)` can target only `T(anyref)` and the static type of the value must be some `ref` type; the result is void.  Traps on OOB with RangeError.
 
 Encoding: (0xFC 0x11 0x00) where the last byte is a flags byte that will eventually accomodate a table index
 
 #### table.grow
 
-`(table.grow delta init-value)` can target only `T(anyref)`.  It exposes the existing JS-level mechanism to wasm and lets even non-exported tables grow. The argument is i32.  The result is i32, the old size of the table; the result will appear negative for memories > 2GB.  Traps on negative arguments with RangeError, so the maximum growth increment is 2GB; not ideal.  Traps with RuntimeError if the grow fails.
+`(table.grow delta-expr init-value-expr)` can target only `T(anyref)`.  It exposes the existing JS-level mechanism to wasm and lets even non-exported tables grow. The argument is i32.  The result is i32, the old size of the table; the result will appear negative for memories > 2GB.  Traps on negative arguments with RangeError, so the maximum growth increment is 2GB; not ideal.  Traps with RuntimeError if the grow fails.
 
 The `init-value` is the value to fill the new slots with, it must be a subtype of anyref.  (The reason `table.grow` can target only `T(anyref)` is that we don't have a notion of a function value yet.)
 
@@ -66,7 +66,7 @@ There can be several tables, with indices starting at zero.  As usual, imports a
 
 In the text format, tables can be named, `(table $tablename length type)`.
 
-An active element segment still can only target one specific table, since the table index is baked into the element.  But it can target any of the tables in the module: `(elem $tablename init function ...)`.  A passive segment cannot carry a table index.
+An active element segment still can only target one specific table, since the table index is baked into the element.  But it can target any of the tables in the module: `(elem $tablename init-index-expr function ...)`.  A passive segment cannot carry a table index.
 
 Encoding: The reserved flags byte in the instruction has bit 0x04 set, in which case there is a table index immediately following (two indices, in the case of `table.copy`).  This encoding will change for sure.
 
@@ -97,17 +97,19 @@ way we now handle blahblah, eg,
 
 ```
 element-index-expr
-table.get table-index
+table.get table-ref
 
 argument-expr
 ...
-call_indirect type-index table-index
+call_indirect table-ref
 
 dest-index-expr
 src-index-expr
 len-expr
-table.copy dest-table-index src-table-index
+table.copy dest-table-ref src-table-ref
 ```
+
+(TODO: doesn't seem highly plausible that the table.copy syntax will work out like this.)
 
 (TODO: it's possible we need to parenthesize the multi-word operators, investigate.)
 
