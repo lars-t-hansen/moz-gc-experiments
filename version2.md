@@ -1,12 +1,12 @@
 (Work in progress.)
 
+Version 2 will extend Version 1, ideally in a compatible fashion (though probably when we fix `nullref` and `ref.null` we'll create incompatibilities).  Here's what's going on.
+
 ## Version opt-in
 
-Version 2 will extend Version 1, ideally in a compatible fashion.  Here's what's going on.
+The module should declare `(gc_feature_opt_in 2)` to use any new table facility that mentions or makes use of `anyref`; this includes most new instructions, which require `anyref` at the moment.  Multi-table functionality that does not use `anyref` (eg having multiple function tables) does not require opting in.
 
-The module must declare `(gc_feature_opt_in 2)` to use any new table facility that mentions or makes use of `anyref`; this includes most new instructions, which require `anyref` at the moment.  Multi-table functionality that does not use `anyref` (eg having multiple function tables) does not require opting in.
-
-At this time, existing version 1 content continues to work in systems that support v2.  This will change when we implement full `nullref` semantics, probably.
+At the moment it will be sufficient to use `(gc_feature_opt_in 1)` but this is not forward-looking.
 
 ## Tables-of-anyref + table manipulation (up for review per Nov 6)
 
