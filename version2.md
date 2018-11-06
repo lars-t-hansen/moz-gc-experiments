@@ -2,13 +2,11 @@ Work in progress.
 
 Version 2 will extend Version 1, ideally in a compatible fashion.  Here's what's going on.
 
-## Generalized tables (up for review per Nov 6)
-
 The module must declare `(gc_feature_opt_in 2)` to use any new table facility that mentions or makes use of `anyref`; this includes most new instructions, which require `anyref` at the moment.  Multi-table functionality that does not use `anyref` (eg having multiple function tables) does not require opting in.
 
 At this time, existing version 1 content continues to work in systems that support v2.  This will change when we implement full `nullref` semantics, probably.
 
-### Tables-of-anyref + instructions to manipulate tables
+## Generalized tables / tables-of-anyref + table manipulation (up for review per Nov 6)
 
 A table can now be of type `anyref` in addition to type `anyfunc`.  In the following, denote table-of-anyref as `T(anyref)` and table-of-anyfunc as `T(anyfunc)`.
 
@@ -20,27 +18,27 @@ Encoding of `T(anyref)`:
 * `anyref` can be used in the wasm text format for the type of the table.
 * `"anyref"` can be used as the element name in the descriptor passed to the JS `WebAssembly.Table` constructor.
 
-#### Wasm instructions that can't operate on table of anyref:
+### Wasm instructions that can't operate on table of anyref:
 
 `table.init` can only be used to init `T(anyfunc)` since the source in this case is an elem segment which can only reference function values.
 
 `call_indirect` requires `T(anyfunc)`.
 
-#### New wasm instructions:
+### New wasm instructions:
 
-##### table.get
+#### table.get
 
 `(table.get index)` can target only `T(anyref)`, the result is `anyref`.
 
 Encoding: (0xFC 0x10 0x00) where the last byte is a flags byte that will eventually accomodate a table index.  Traps on OOB with RangeError.
 
-##### table.set
+#### table.set
 
 `(table.set index value)` can target only `T(anyref)` and the static type of the value must be some `ref` type; the result is void.  Traps on OOB with RangeError.
 
 Encoding: (0xFC 0x11 0x00) where the last byte is a flags byte that will eventually accomodate a table index
 
-##### table.grow
+#### table.grow
 
 `(table.grow delta init-value)` can target only `T(anyref)`.  It exposes the existing JS-level mechanism to wasm and lets even non-exported tables grow. The argument is i32.  The result is i32, the old size of the table; the result will appear negative for memories > 2GB.  Traps on negative arguments with RangeError, so the maximum growth increment is 2GB; not ideal.  Traps with RuntimeError if the grow fails.
 
@@ -48,19 +46,19 @@ The `init-value` is the value to fill the new slots with, it must be a subtype o
 
 Encoding: (0xFC 0x0F 0x00) where the last byte is a flags byte that will eventually accomodate a table index
 
-##### table.size
+#### table.size
 
 `(table.size)` returns the size of the table as an i32.
 
-##### table.fill
+#### table.fill
 
 TBD - not yet implemented
 
-#### Changed JS API
+### Changed JS API
 
 Setting elements in a `T(anyref)` with `WebAssembly.Table.prototype.set(value)` from JS will store JS objects.  If the value being set is not already an object we perform the same coercion as we do on a function boundary when JS passes a non-object to a wasm function that takes an anyref.  (Currently this is a ToObject operation but this is subject to change.)
 
-### Multiple tables (up for review per Nov 6)
+## Multiple tables (up for review per Nov 6)
 
 There can be several tables, with indices starting at zero.  As usual, imports are numbered before local tables.
 
