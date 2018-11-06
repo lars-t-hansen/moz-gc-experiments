@@ -1,4 +1,6 @@
-Work in progress.
+(Work in progress.)
+
+## Version opt-in
 
 Version 2 will extend Version 1, ideally in a compatible fashion.  Here's what's going on.
 
@@ -6,7 +8,7 @@ The module must declare `(gc_feature_opt_in 2)` to use any new table facility th
 
 At this time, existing version 1 content continues to work in systems that support v2.  This will change when we implement full `nullref` semantics, probably.
 
-## Generalized tables / tables-of-anyref + table manipulation (up for review per Nov 6)
+## Tables-of-anyref + table manipulation (up for review per Nov 6)
 
 A table can now be of type `anyref` in addition to type `anyfunc`.  In the following, denote table-of-anyref as `T(anyref)` and table-of-anyfunc as `T(anyfunc)`.
 
@@ -18,13 +20,13 @@ Encoding of `T(anyref)`:
 * `anyref` can be used in the wasm text format for the type of the table.
 * `"anyref"` can be used as the element name in the descriptor passed to the JS `WebAssembly.Table` constructor.
 
-### Wasm instructions that can't operate on table of anyref:
+### Wasm instructions that can't operate on table-of-anyref
 
 `table.init` can only be used to init `T(anyfunc)` since the source in this case is an elem segment which can only reference function values.
 
 `call_indirect` requires `T(anyfunc)`.
 
-### New wasm instructions:
+### New wasm instructions for table manipulation
 
 #### table.get
 
@@ -64,25 +66,30 @@ There can be several tables, with indices starting at zero.  As usual, imports a
 
 In the text format, tables can be named, `(table $tablename length type)`.
 
-An active element segment still can only target one specific table, since the table index is baked into the element.  But it can target any of the tables in the module: `(elem $tablename init function ...)`.  A passive segment cannot carry a table name.
+An active element segment still can only target one specific table, since the table index is baked into the element.  But it can target any of the tables in the module: `(elem $tablename init function ...)`.  A passive segment cannot carry a table index.
+
+Encoding: The reserved flags byte in the instruction has bit 0x04 set, in which case there is a table index immediately following (two indices, in the case of `table.copy`).  This encoding will change for sure.
 
 The table index is always baked into the wasm instructions.  In the text format, the table index is optional for backwards compatibility reasons.
 
-Fully parenthesized syntax, here "type" and "table" can be literal indices or names in the appropriate namespaces:
+Fully parenthesized syntax:
 
 ```
-(call_indirect type table argument-expr ...)
-(call_indirect type argument-expr ...)
+(call_indirect table-ref type-ref argument-expr ...)
+(call_indirect type-ref argument-expr ...)
 (table.get element-index-expr)
-(table.get table-index element-index-expr)
+(table.get table-ref element-index-expr)
 (table.set element-index-expr value-expr)
-(table.set table-index element-index-expr value-expr)
-(table.init dest-table-index src-segment-index dest-index-expr src-index-expr len-expr)
-(table.copy dest-table-index dest-index-expr src-table-index src-index-expr len-expr)
-(table.grow delta init-value)
-(table.grow table-index delta init-value)
+(table.set table-ref element-index-expr value-expr)
+(table.init dest-table-ref src-segment-ref dest-index-expr src-index-expr len-expr)
+(table.init src-segment-ref dest-index-expr src-index-expr len-expr)
+(table.copy dest-table-ref dest-index-expr src-table-ref src-index-expr len-expr)
+(table.copy dest-index-expr src-index-expr len-expr)
+(table.grow table-ref delta-expr init-value-expr)
+(table.grow delta-expr init-value-expr)
+(table.size table-ref)
 (table.size)
-(table.size table-index)
+;; table.fill TBD
 ```
 
 In the RPN text format, if the instructions carry table indices then they follow the opcodes in the same
@@ -108,9 +115,7 @@ table.copy dest-table-index src-table-index
 
 We can `table.copy` only between tables of the same type.
 
-Possibly, if there are multiple tables in play we should consider disallowing the default table, but it's hard to do this without two passes...  The text format is a boondoggle anyway and used only for small things, so it's probably not a big deal. 
-
-### anyfunc as value type, and fallout from that
+## anyfunc as value type, and fallout from that
 
 (Work in progress)
 
@@ -130,11 +135,11 @@ this is fairly obvious; value must be anyref.  on `T(anyfunc)` the static type m
 
 TODO: no downcast function at this point, so if we have an `anyref` we can't cast it dynamically to `anyfunc` or test whether we could do that safely.  
 
-### nullref
+## nullref
 
 Change the current `(ref.null T)` construction into `ref.null` and introduce the `nullref` type.  For backward compatibility, continue to accept the old encoding?  Tricky, because then we'll need a new opcode.
 
-### Tentative cleanup, other
+## Tentative cleanup, other
 
 Rename or create alias for `ref.is_null` as `ref.isnull` (as spec requires).  Superficial text format change.
 
