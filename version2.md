@@ -58,7 +58,17 @@ TBD - not yet implemented
 
 ### Changed JS API
 
-Setting elements in a `T(anyref)` with `WebAssembly.Table.prototype.set(value)` from JS will store JS objects.  If the value being set is not already an object we perform the same coercion as we do on a function boundary when JS passes a non-object to a wasm function that takes an anyref.  (Currently this is a ToObject operation but this is subject to change.)
+#### WebAssembly.Table.prototype.set
+
+Setting elements in a `T(anyref)` with `WebAssembly.Table.prototype.set(value)` from JS will store JS objects.  If the value being set is not already an object we perform the same coercion as we do on a function boundary when JS passes a non-object to a wasm function that takes an anyref.
+
+In the future, the conercion operation will be a BoxAsAnyref operation, which is not the same as ToObject.
+
+#### WebAssembly.Table.prototype.grow
+
+This function takes an optional second argument.  If the argument is not present it is taken to be `null`.  Otherwise it is coerced to an Object value by ToObject (note this fails for `undefined`).  The value is used as the default argument with which to initialize the table.  For a `T(anyfunc)` it must be an appropriate function (TBD - I think this means an exported wasm function).  For a `T(anyref)` any object value will do.
+
+In the future, the conercion operation will be a BoxAsAnyref operation, which is not the same as ToObject.
 
 ## Multiple tables (up for review per Nov 6)
 
@@ -113,7 +123,13 @@ table.copy dest-table-ref src-table-ref
 
 We can `table.copy` only between tables of the same type.
 
-## anyfunc as value type, and fallout from that
+## nullref
+
+Change the current `(ref.null T)` construction into `ref.null` and introduce the `nullref` type.
+
+ISSUE: For backward compatibility, continue to accept the old encoding?  Tricky, because then we'll need a new opcode; if we have to change the binary format then we might as well get rid of the old encoding.
+
+## anyfunc as a value type, and fallout from that
 
 (Work in progress)
 
@@ -132,10 +148,6 @@ When `table.get` targets a `T(anyfunc)` what do we return?  probably a function 
 this is fairly obvious; value must be anyref.  on `T(anyfunc)` the static type must be anyfunc.
 
 TODO: no downcast function at this point, so if we have an `anyref` we can't cast it dynamically to `anyfunc` or test whether we could do that safely.  
-
-## nullref
-
-Change the current `(ref.null T)` construction into `ref.null` and introduce the `nullref` type.  For backward compatibility, continue to accept the old encoding?  Tricky, because then we'll need a new opcode.
 
 ## Tentative cleanup, other
 
