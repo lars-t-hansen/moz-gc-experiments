@@ -8,7 +8,7 @@ The module should declare `(gc_feature_opt_in 2)` to use any new table facility 
 
 At the moment it will be sufficient to use `(gc_feature_opt_in 1)` but this is not forward-looking.
 
-## Tables-of-anyref + table manipulation (up for review per Nov 6)
+## Tables-of-anyref + table manipulation (landed Nov 14)
 
 A table can now be of type `anyref` in addition to type `anyfunc`.  In the following, denote table-of-anyref as `T(anyref)` and table-of-anyfunc as `T(anyfunc)`.
 
@@ -70,7 +70,7 @@ This function takes an optional second argument.  If the argument is not present
 
 In the future, the conercion operation will be a BoxAsAnyref operation, which is not the same as ToObject.
 
-## Multiple tables (up for review per Nov 6)
+## Multiple tables (landed Nov 14)
 
 There can be several tables, with indices starting at zero.  As usual, imports are numbered before local tables.
 
