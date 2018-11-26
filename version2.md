@@ -1,6 +1,8 @@
-# Version 2 - reftypes + the Minimal Viable Alpha for GC Types
+# Version 2 - reftypes + GCTypes Minimal Viable Alpha
 
-Version 2 represents two overlapping feature sets: the full [reftypes proposal](https://github.com/WebAssembly/reference-types) (minus the `funcref` type), and a simple system of GC types that is module-internal (types are entirely private to a module) but whose object instances can be passed between wasm modules and between wasm and JS.  For the GC types it still aims to be a "minimal viable alpha" (MVA): the minimal system that can do something useful and allow for experimentation, but which compromises on expressibility and performance in several ways.
+Version 2 extends Version 1 to represent two overlapping feature sets: the full [reftypes proposal](https://github.com/WebAssembly/reference-types) (minus the `funcref` type), and a simple system of GC types that is module-internal (types are entirely private to a module) but whose object instances can be passed between wasm modules and between wasm and JS.  For the GC types it still aims to be a "minimal viable alpha" (MVA): the minimal system that can do something useful and allow for experimentation, but which compromises on expressibility and performance in several ways.
+
+Note that Version 2 is not backward compatible with Version 1 due to changes to the `ref.null` instruction.
 
 **Table of contents:**
 
@@ -13,17 +15,25 @@ Version 2 represents two overlapping feature sets: the full [reftypes proposal](
 
 ## Overview
 
-* new module section to opt-in to this experimental system
-* new --wasm-gc / javascript.options.wasm_gc switches to enable in the engine (*will go away before MVA is complete*)
-* structure type definitions `(struct (field T) ...)` w/o explicit inheritance
-* reference types: `anyref` and `(ref T)` where T names a structure type
-* nominal type equality for primitive and reference types
-* simple prefix typing based on type equality for implict upcast
-* shallow structural downcast from a type A to a type B where A is a prefix of B
-* locals, parameters, globals, and return values of reference types
-* restrictions on `(ref T)` types to avoid exposing types outside the module
-* new instructions `ref.null`, `ref.is_null`, `ref.eq`, `struct.new`, `struct.get`, `struct.set`, `struct.narrow`
-* instances of structure types are visible to JS as TypedObject instances
+* Feature control
+  * New module section for content to opt-in to this experimental system
+  * New --wasm-gc / javascript.options.wasm_gc switches to enable in the engine
+* Reference types
+  * Types `anyref` and `(ref T)` where T names a structure type
+  * Locals, parameters, globals, and return values of reference types
+  * Restrictions on `(ref T)` types to avoid exposing types outside the module
+  * New instructions `ref.null`, `ref.is_null`, `ref.eq` to manipulate references
+* Generalized tables
+  * Tables of base type anyref
+  * Multiple tables
+  * New instructions `table.get`, `table.set`, `table.grow`, `table.size` for manipulating tables
+* Structure types
+  * Type definitions `(struct (field T) ...)` w/o explicit inheritance
+  * Nominal type equality for primitive and reference types
+  * Simple prefix typing based on type equality for implict upcast
+  * Shallow structural downcast from a type A to a type B where A is a prefix of B
+  * New instructions `ref.null`, `ref.is_null`, `ref.eq`, `struct.new`, `struct.get`, `struct.set`, `struct.narrow`
+  * Instances of structure types are visible to JS as TypedObject instances
 
 ## Feature control
 
