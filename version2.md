@@ -1,12 +1,10 @@
-(Work in progress.)
+(Work in progress, quite unstructured.  Assume that the Version 1 document is the base document.)
 
-Version 2 will extend Version 1, ideally in a compatible fashion (though probably when we fix `nullref` and `ref.null` we'll create incompatibilities).  Here's what's going on.
+Version 2 extends Version 1 in an incompatible fashion, due currently to changes to `ref.null`.  See the version 1 document for more.
 
 ## Version opt-in
 
 The module should declare `(gc_feature_opt_in 2)` to use any new table facility that mentions or makes use of `anyref`; this includes most new instructions, which require `anyref` at the moment.  Multi-table functionality that does not use `anyref` (eg having multiple function tables) does not require opting in.
-
-At the moment it will be sufficient to use `(gc_feature_opt_in 1)` but this is not forward-looking.
 
 ## Tables-of-anyref + table manipulation (landed Nov 14)
 
@@ -66,7 +64,7 @@ In the future, the conercion operation will be a BoxAsAnyref operation, which is
 
 #### WebAssembly.Table.prototype.grow
 
-This function takes an optional second argument.  If the argument is not present it is taken to be `null`.  Otherwise it is coerced to an Object value by ToObject (note this fails for `undefined`).  The value is used as the default argument with which to initialize the table.  For a `T(anyfunc)` it must be an appropriate function (TBD - I think this means an exported wasm function).  For a `T(anyref)` any object value will do.
+This function takes an optional second argument (note, not implemented as of November 26).  If the argument is not present it is taken to be `null`.  Otherwise it is coerced to an Object value by ToObject (note this fails for `undefined`).  The value is used as the default argument with which to initialize the table.  For a `T(anyfunc)` it must be an appropriate function (TBD - I think this means an exported wasm function).  For a `T(anyref)` any object value will do.
 
 In the future, the conercion operation will be a BoxAsAnyref operation, which is not the same as ToObject.
 
@@ -122,12 +120,6 @@ table.copy dest-table-ref src-table-ref
 ```
 
 We can `table.copy` only between tables of the same type.
-
-## nullref
-
-Change the current `(ref.null T)` construction into `ref.null` and introduce the `nullref` type.
-
-ISSUE: For backward compatibility, continue to accept the old encoding?  Tricky, because then we'll need a new opcode; if we have to change the binary format then we might as well get rid of the old encoding.
 
 ## anyfunc as a value type, and fallout from that
 
