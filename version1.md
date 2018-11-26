@@ -1,5 +1,7 @@
 # Version 1 - the Minimal Viable Alpha
 
+Version 1 is **OBSOLETE** as of November 26 2018 and is no longer recognized by Firefox Nightly, due to a break in the encoding of `ref.null`.  Use Version 2, which is otherwise compatible.
+
 Version 1 represents a simple system of GC types that is module-internal (types are entirely private to a module) but whose object instances can be passed between wasm modules and between wasm and JS.  It aims to be a "minimal viable alpha" (MVA): the minimal system that can do something useful and allow for experimentation, but which compromises on expressibility and performance in several ways.
 
 **Table of contents:**
@@ -13,7 +15,7 @@ Version 1 represents a simple system of GC types that is module-internal (types 
 ## Overview
 
 * new module section to opt-in to this experimental system
-* new --wasm-gc / javascript.options.wasm_gc switches to enable in the engine (*will go away before MVA is complete*)
+* new --wasm-gc / javascript.options.wasm_gc switches to enable in the engine
 * structure type definitions `(struct (field T) ...)` w/o explicit inheritance
 * reference types: `anyref` and `(ref T)` where T names a structure type
 * nominal type equality for primitive and reference types
@@ -26,19 +28,17 @@ Version 1 represents a simple system of GC types that is module-internal (types 
 
 As of September 21 2018, this has all landed in Firefox.  What we want for Version 1 to be complete is to remove the command line switches and some hacks that are turned on by them.  Follow [bug 1444925](https://bugzilla.mozilla.org/show_bug.cgi?id=1444925) and its blockers.
 
-As of November 26 2018, version 1 is no longer recognized by Firefox, due to a compatibility break in `ref.null`.  However, all version 1 code continues to run *if* the opt-in version is changed to 2 *and* the type argument to `ref.null` is removed from the text and binary encodings.  See [Feature control](#feature-control) and [Instructions](#instructions) for details.
-
 ## Feature control
 
 The experimental GC feature is only available if a special section is present in each module.  Without this section, validation will fail.
 
 The section has ID = 42 (GcFeatureOptIn), byte length 1, and the single byte in the section is the version number.  As we move to later versions, older content may or may not remain compatible with newer engines; newer engines that cannot process older content will reject the content in validation.
 
-The version number must be `2` for nightlies built on November 26 2018 and later; `1` for older nightlies.  
+The version number must be `1` for nightlies built before November 26 2018 and later.  
 
 The new section must be the first non-custom section in the module.
 
-In the textual format accepted by SpiderMonkey's wasmTextToBinary(), write `(gc_feature_opt_in 2)` to create this section.
+In the textual format accepted by SpiderMonkey's wasmTextToBinary(), write `(gc_feature_opt_in 1)` to create this section.
 
 ## Struct and Ref Types
 
@@ -111,11 +111,7 @@ Common subtyping rules:
 (ref T) <: (ref T)
 (ref T) <: (ref U) if T <: U
 T <: U if there is a type W s.t. T <: W and W <: U
-nullref <: anyref
-nullref <: (ref T)
 ```
-
-Note that `nullref` is not expressible in the text or binary formats, it is the result of a `ref.null` expression only.  In the future, there will be reference types of which `nullref` is not a subtype.
 
 Prefix subtyping rule for structures:
 
@@ -140,21 +136,6 @@ Instruction encodings are temporary.  0xFC is the "misc" prefix, previously "num
 `Instruction ::= Ref.Null | Ref.IsNull | Ref.Eq | Struct.New | Struct.Get | Struct.Set | Struct.Narrow`
 
 ### ref.null
-
-#### Version 2 semantics
-
-Create a null reference.
-
-_Synopsis:_ `Ref.Null ::= ... <ref.null>`
-
-_Encoding:_ 0xD0
-
-_Result type_: NullRef
-
-_Execution_:
-* Push a null reference
-
-#### Version 1 semantics (before November 26 2018)
 
 Create a typed null reference.
 
