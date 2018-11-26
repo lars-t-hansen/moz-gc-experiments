@@ -24,17 +24,21 @@ Version 1 represents a simple system of GC types that is module-internal (types 
 * new instructions `ref.null`, `ref.is_null`, `ref.eq`, `struct.new`, `struct.get`, `struct.set`, `struct.narrow`
 * instances of structure types are visible to JS as TypedObject instances
 
-As of September 21, this has all landed in Firefox.  What we want for Version 1 to be complete is to remove the command line switches and some hacks that are turned on by them.  Follow [bug 1444925](https://bugzilla.mozilla.org/show_bug.cgi?id=1444925) and its blockers.
+As of September 21 2018, this has all landed in Firefox.  What we want for Version 1 to be complete is to remove the command line switches and some hacks that are turned on by them.  Follow [bug 1444925](https://bugzilla.mozilla.org/show_bug.cgi?id=1444925) and its blockers.
+
+As of November 26 2018, version 1 is no longer recognized by Firefox, due to a compatibility break in `ref.null`.  However, all version 1 code continues to run *if* the opt-in version is changed to 2 *and* the type argument to `ref.null` is removed from the text and binary encodings.  See [Feature control](#feature-control) and [Instructions](#instructions) for details.
 
 ## Feature control
 
 The experimental GC feature is only available if a special section is present in each module.  Without this section, validation will fail.
 
-The section has ID = 42 (GcFeatureOptIn), byte length 1, and the single byte in the section is the version number, which must be `1` at the moment.  As we move to later versions, older content may or may not remain compatible with newer engines; newer engines that cannot process older content will reject the content in validation.
+The section has ID = 42 (GcFeatureOptIn), byte length 1, and the single byte in the section is the version number.  As we move to later versions, older content may or may not remain compatible with newer engines; newer engines that cannot process older content will reject the content in validation.
+
+The version number must be `2` for nightlies built on November 26 2018 and later; `1` for older nightlies.  
 
 The new section must be the first non-custom section in the module.
 
-In the textual format accepted by SpiderMonkey's wasmTextToBinary(), write `(gc_feature_opt_in 1)` to create this section.
+In the textual format accepted by SpiderMonkey's wasmTextToBinary(), write `(gc_feature_opt_in 2)` to create this section.
 
 ## Struct and Ref Types
 
@@ -107,7 +111,11 @@ Common subtyping rules:
 (ref T) <: (ref T)
 (ref T) <: (ref U) if T <: U
 T <: U if there is a type W s.t. T <: W and W <: U
+nullref <: anyref
+nullref <: (ref T)
 ```
+
+Note that `nullref` is not expressible in the text or binary formats, it is the result of a `ref.null` expression only.  In the future, there will be reference types of which `nullref` is not a subtype.
 
 Prefix subtyping rule for structures:
 
@@ -132,6 +140,21 @@ Instruction encodings are temporary.  0xFC is the "misc" prefix, previously "num
 `Instruction ::= Ref.Null | Ref.IsNull | Ref.Eq | Struct.New | Struct.Get | Struct.Set | Struct.Narrow`
 
 ### ref.null
+
+#### Version 2 semantics
+
+Create a null reference.
+
+_Synopsis:_ `Ref.Null ::= ... <ref.null>`
+
+_Encoding:_ 0xD0
+
+_Result type_: NullRef
+
+_Execution_:
+* Push a null reference
+
+#### Version 1 semantics (before November 26 2018)
 
 Create a typed null reference.
 
