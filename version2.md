@@ -37,6 +37,8 @@ Note that Version 2 is not backward compatible with Version 1 due to changes to 
 
 ## Feature control
 
+### Special section required
+
 The experimental GC feature is only available if a special section is present in each module.  Without this section, validation will fail.  Currently, all reftypes features also require the special section.
 
 The section has ID = 42 (GcFeatureOptIn), byte length 1, and the single byte in the section is the version number.  As we move to later versions, older content may or may not remain compatible with newer engines; newer engines that cannot process older content will reject the content in validation.
@@ -46,6 +48,14 @@ The version number must be `2` for nightlies built on November 26 2018 and later
 The new section must be the first non-custom section in the module.
 
 In the textual format accepted by SpiderMonkey's wasmTextToBinary(), write `(gc_feature_opt_in 2)` to create this section.
+
+### Opt-in switch required
+
+For the time being, users of Firefox or the SpiderMonkey shell must opt-in to reftypes and struct types by setting a flag.  In the browser, go to the `about:config` tab and set `javascript.options.wasm_gc` to `true`.  For the SpiderMonkey shell, pass `--wasm-gc` on the command line.
+
+### Performance implications
+
+At this time (2 January 2019), content that opts in with the special section is baseline-compiled only, ie, the optimizing compiler is not used, and as a consequence programs will generally run slower.  This is in the process of being fixed.
 
 ## Struct and Ref Types
 
