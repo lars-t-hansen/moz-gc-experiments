@@ -4,7 +4,7 @@ Versions 2+3 extend Version 1 to represent two overlapping feature sets: the ful
 
 Version 2 is not backward compatible with Version 1 due to changes to the `ref.null` instruction.
 
-Version 3 is not backward compatible with Version 2 due to changes to the `ref.eq`, `table.get`, `table.set`, and `table.size` instructions, nor with the encoding of table indices in the `call_indirect` instruction, but otherwise does not (yet) extend Version 2 in any interesting way.
+Version 3 is not backward compatible with Version 2 due to opcode changes to the `ref.eq`, `table.get`, `table.set`, and `table.size` instructions, as well as due to changes to the encoding of table indices used in the table instructions (including in the `call_indirect` instruction).  Otherwise Version 3 does not (yet) extend Version 2 in any interesting way.
 
 **Table of contents:**
 
@@ -227,7 +227,9 @@ Instruction encodings are temporary.  0xFC is the "misc" prefix, previously "num
 
 ### call_indirect
 
-The existing `call_indirect` instruction can operate on any table, but requires the base type of that table to be `anyfunc` and will fail validation if the base type is `anyref`.
+The existing `call_indirect` instruction is changed to operate on any table, but requires the base type of that table to be `anyfunc` and will fail validation if the base type is `anyref`.
+
+The table index is a varuint32 that replaces the reserved byte at the end of this instruction.  This encoding is new with Version 3.
 
 ### ref.null
 
