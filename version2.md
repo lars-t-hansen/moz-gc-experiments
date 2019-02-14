@@ -1,8 +1,10 @@
-# Version 2 - reftypes + GCTypes Minimal Viable Alpha
+# Versions 2+3 - reftypes + GCTypes Minimal Viable Alpha
 
-Version 2 extends Version 1 to represent two overlapping feature sets: the full [reftypes proposal](https://github.com/WebAssembly/reference-types) (minus the `funcref` type), and a simple system of GC types that is module-internal (types are entirely private to a module) but whose object instances can be passed between wasm modules and between wasm and JS.  For the GC types it still aims to be a "minimal viable alpha" (MVA): the minimal system that can do something useful and allow for experimentation, but which compromises on expressibility and performance in several ways.
+Versions 2+3 extend Version 1 to represent two overlapping feature sets: the full [reftypes proposal](https://github.com/WebAssembly/reference-types) (minus the `funcref` type), and a simple system of GC types that is module-internal (types are entirely private to a module) but whose object instances can be passed between wasm modules and between wasm and JS.  For the GC types it still aims to be a "minimal viable alpha" (MVA): the minimal system that can do something useful and allow for experimentation, but which compromises on expressibility and performance in several ways.
 
-Note that Version 2 is not backward compatible with Version 1 due to changes to the `ref.null` instruction.
+Version 2 is not backward compatible with Version 1 due to changes to the `ref.null` instruction.
+
+Version 3 is not backward compatible with Version 2 due to changes to the `ref.eq`, `table.get`, `table.set`, and `table.size` instructions, nor with the encoding of table indices in the `call_indirect` instruction, but otherwise does not (yet) extend Version 2 in any interesting way.
 
 **Table of contents:**
 
@@ -43,11 +45,11 @@ The experimental GC feature is only available if a special section is present in
 
 The section has ID = 42 (GcFeatureOptIn), byte length 1, and the single byte in the section is the version number.  As we move to later versions, older content may or may not remain compatible with newer engines; newer engines that cannot process older content will reject the content in validation.
 
-The version number must be `2` for nightlies built on November 26 2018 and later.  Older versions are rejected.
+The version number must be `3` for nightlies built on February XX 2019 and later (patch in flight).  Older versions are rejected.
 
 The new section must be the first non-custom section in the module.
 
-In the textual format accepted by SpiderMonkey's wasmTextToBinary(), write `(gc_feature_opt_in 2)` to create this section.
+In the textual format accepted by SpiderMonkey's wasmTextToBinary(), write `(gc_feature_opt_in 3)` to create this section.
 
 ### Opt-in switch required
 
@@ -55,7 +57,7 @@ For the time being, users of Firefox or the SpiderMonkey shell must opt-in to re
 
 ### Performance implications
 
-At this time (2 January 2019), content that opts in with the special section is baseline-compiled only, ie, the optimizing compiler is not used, and as a consequence programs will generally run slower.  This is in the process of being fixed.
+At this time (14 February 2019), content that opts in with the special section is baseline-compiled only, ie, the optimizing compiler is not used, and as a consequence programs will generally run slower.  This is in the process of being fixed.
 
 ## Struct and Ref Types
 
@@ -172,7 +174,7 @@ In the text format, tables can be named, `(table $tablename length type)`.
 
 An active element segment still can only target one specific table, since the table index is baked into the element.  But it can target any of the tables in the module: `(elem $tablename init-index-expr function ...)`.  A passive segment cannot carry a table index.
 
-Encoding: The reserved flags byte in the instruction has bit 0x04 set, in which case there is a table index immediately following (two indices, in the case of `table.copy`).  This encoding will change for sure.
+Version 3 encoding: the reserved byte in the table instructions (previously always zero) has been turned into a varuint32 table index; value zero means table zero, so this is backwards compatible.
 
 The table index is always baked into the wasm instructions.  In the text format, the table index is optional for backwards compatibility reasons.
 
@@ -263,7 +265,7 @@ Compare two references for pointer equality.
 
 _Synopsis:_ `Ref.Eq ::= ... Expr_0 Expr_1 <ref.eq>`
 
-_Encoding:_ 0xD2
+_Encoding:_ 0xF0.  The encoding is new in Version 3.
 
 _Validation:_
 * The types of Expr_0 and Expr_1 must unify in the normal way and must be subtypes of anyref
@@ -282,13 +284,13 @@ The existing `table.init` instruction (from the [bulk memory proposal](https://g
 
 `(table.get index-expr)` can target only `T(anyref)`, the result is `anyref`.
 
-Encoding: (0xFC 0x10 0x00) where the last byte is a flags byte that will eventually accomodate a table index.  Traps on OOB with RangeError.
+Encoding: (0x25 table-index) where the table-index is a varuint32.  Traps on OOB with RangeError.  The encoding is new in Version 3.
 
 ### table.set
 
 `(table.set index-expr value-expr)` can target only `T(anyref)` and the static type of the value must be some `ref` type; the result is void.  Traps on OOB with RangeError.
 
-Encoding: (0xFC 0x11 0x00) where the last byte is a flags byte that will eventually accomodate a table index
+Encoding: (0x26 table-index) where the table-index is a varuint32.  The encoding is new in Version 3.
 
 ### table.grow
 
@@ -296,15 +298,17 @@ Encoding: (0xFC 0x11 0x00) where the last byte is a flags byte that will eventua
 
 The `init-value` is the value to fill the new slots with, it must be a subtype of anyref.  (The reason `table.grow` can target only `T(anyref)` is that we don't have a notion of a function value yet.)
 
-Encoding: (0xFC 0x0F 0x00) where the last byte is a flags byte that will eventually accomodate a table index
+Encoding: (0xFC 0x0F table-index) where the table-index is a varuint32.
 
 ### table.size
 
 `(table.size)` returns the size of the table as an i32.
 
+Encoding: (0xFC 0x10 table-index) where the table-index is a varuint32.  The encoding is new in Version 3.
+
 ### table.fill
 
-TBD - not yet implemented
+TBD - not yet implemented.  Reserved encoding (0xFC 0x11 table-index).
 
 ### struct.new
 
