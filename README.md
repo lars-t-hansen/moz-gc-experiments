@@ -1,4 +1,4 @@
-# moz-gc-exeriments
+# moz-gc-experiments
 
 Documentation etc for ongoing wasm gc experiments at Mozilla
 
