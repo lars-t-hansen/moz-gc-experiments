@@ -41,7 +41,9 @@ Version 3 is not backward compatible with Version 2 due to opcode changes to the
 
 ### Special section required
 
-The experimental GC feature is only available if a special section is present in each module.  Without this section, validation will fail.  Currently, all reftypes features also require the special section.
+The experimental GC feature is only available if a special section is present in each module.  Without this section, validation will fail.
+
+As of roughly March 7, 2019, reftypes features no longer require the special section.  Before that date, the special section was required also for all reftypes features.
 
 The section has ID = 42 (GcFeatureOptIn), byte length 1, and the single byte in the section is the version number.  As we move to later versions, older content may or may not remain compatible with newer engines; newer engines that cannot process older content will reject the content in validation.
 
