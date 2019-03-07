@@ -55,7 +55,9 @@ In the textual format accepted by SpiderMonkey's wasmTextToBinary(), write `(gc_
 
 ### Opt-in switch required
 
-For the time being, users of Firefox or the SpiderMonkey shell must opt-in to reftypes and struct types by setting a flag.  In the browser, go to the `about:config` tab and set `javascript.options.wasm_gc` to `true`.  For the SpiderMonkey shell, pass `--wasm-gc` on the command line.
+For the time being, users of Firefox or the SpiderMonkey shell must opt-in to struct types and `ref.eq` by setting a flag.  In the browser, go to the `about:config` tab and set `javascript.options.wasm_gc` to `true`.  For the SpiderMonkey shell, pass `--wasm-gc` on the command line.
+
+Before roughtly March 7, 2019, the flag was required also for reftypes features (`anyref`, `ref.null`, `ref.is_null`, `table.get`, `table.set`, `table.size`, `table.grow`).
 
 ### Performance implications
 
