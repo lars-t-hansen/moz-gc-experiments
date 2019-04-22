@@ -91,7 +91,6 @@ In the Types section, a struct type looks like this (temporary encoding):
 
 ```
 form         varint7        0x50 = SLEB(-0x30), represents "struct constructor"
-flags        varint7        no flags at present
 field_count  varuint32
 field_types  field_type*
 ```
