@@ -105,7 +105,7 @@ type         value_type    // i32 etc, anyref, ref_type
 and the encoding of a ref_type is straightforward:
 
 ```
-ref_type     0x6E varuint32    the parameter is a reference into the type section
+ref_type     0x6D varuint32    the parameter is a reference into the type section
 ```
 
 ### Validation
